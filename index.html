@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        .login-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .welcome-container {
+            text-align: center;
+            display: none;
+        }
+
+        .welcome-container h2 {
+            color: #4CAF50;
+        }
+
+        #startButton {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #startButton:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container" id="loginContainer">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Enter username" required>
+        <input type="password" id="password" placeholder="Enter password" required>
+        <button onclick="login()">Login</button>
+    </div>
+
+    <div class="welcome-container" id="welcomeContainer">
+        <h2>Welcome to supervisor Exam</h2>
+        <p>If you are ready for the exam, click below to start.</p>
+        <button id="startButton" onclick="startExam()"><a href="mp.html">Start</a></button>
+    </div>
+
+    <script>
+        function login() {
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+
+            // Checking if username and password are correct
+            if(username === "omprakash" && password === "om@12345") {
+                // Hide login form and show welcome message
+                document.getElementById("loginContainer").style.display = "none";
+                document.getElementById("welcomeContainer").style.display = "block";
+            } else {
+                alert("Invalid username or password. Please try again.");
+            }
+        }
+
+        function startExam() {
+            alert("Exam started! Best of luck!");
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,445 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hindi Exam</title>
+    <style>
+        /* Resetting margin and padding */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Exam container */
+        .exam-container {
+            background-color: #fff;
+            padding: 40px;
+            width: 100%;
+            max-width: 800px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .exam-container h2 {
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .question-container {
+            text-align: left;
+            margin-bottom: 30px;
+        }
+
+        .question-container h3 {
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            color: #2c3e50;
+        }
+
+        /* Styling for options */
+        .options {
+            margin-bottom: 20px;
+        }
+
+        .options input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .options label {
+            font-size: 1.1em;
+            color: #555;
+            display: block;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        /* Button styles */
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Disable buttons */
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Summary container styling */
+        .summary-container {
+            display: none;
+            text-align: center;
+        }
+
+        .summary-container p {
+            font-size: 1.1em;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        /* Answer container styling */
+        .answer-container {
+            display: none;
+            text-align: left;
+            padding: 20px;
+            font-size: 1em;
+        }
+
+        .answer-container p {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .answer-container h3 {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="exam-container" id="examContainer">
+        <div class="question-container" id="questionContainer">
+            <h2>Question</h2>
+            <p id="questionText"></p>
+            <div id="options"></div>
+            <button id="previousBtn" onclick="previousQuestion()">Previous</button>
+            <button id="nextBtn" onclick="nextQuestion()">Next</button>
+        </div>
+        <button onclick="submitExam()">Submit</button>
+    </div>
+
+    <div class="summary-container" id="summaryContainer">
+        <h2>Exam Summary</h2>
+        <p>Total Questions: <span id="totalQuestions">0</span></p>
+        <p>Attempted Questions: <span id="attemptedQuestions">0</span></p>
+        <p>Correct Answers: <span id="correctAnswers">0</span></p>
+        <p>Wrong Answers: <span id="wrongAnswers">0</span></p>
+        <button onclick="showAnswers()">Click here to view correct answers</button>
+    </div>
+
+    <div class="answer-container" id="answerContainer">
+        <h2>Correct Answers</h2>
+        <div id="answerList"></div>
+        <button onclick="restartExam()">Restart Exam</button>
+    </div>
+
+    <script>
+        // Array of 100 questions
+        const questions = [
+        {
+        question: "महिला सशक्तिकरण का मुख्य उद्देश्य क्या है?",
+        options: ["महिलाओं के अधिकारों की सुरक्षा", "महिलाओं का शोषण", "महिलाओं को समाज से अलग करना", "महिलाओं के खिलाफ हिंसा"],
+        answer: "महिलाओं के अधिकारों की सुरक्षा"
+    },
+    {
+        question: "महिला पर्यावरण शिक्षा का मुख्य उद्देश्य क्या है?",
+        options: ["महिला जागरूकता", "स्वास्थ्य में सुधार", "प्राकृतिक संसाधनों का संरक्षण", "शहरीकरण"],
+        answer: "प्राकृतिक संसाधनों का संरक्षण"
+    },
+    {
+        question: "आंगनवाड़ी कार्यकर्ता का क्या प्रमुख कार्य है?",
+        options: ["स्वास्थ्य जांच", "शिक्षा देना", "बच्चों को आंगनवाड़ी में खिलाना", "सब"],
+        answer: "सब"
+    },
+    {
+        question: "महिला अधिकारों का उल्लंघन करने वाली सबसे बड़ी समस्या क्या है?",
+        options: ["शारीरिक उत्पीड़न", "मानसिक उत्पीड़न", "आर्थिक उत्पीड़न", "सामाजिक उत्पीड़न"],
+        answer: "शारीरिक उत्पीड़न"
+    },
+    {
+        question: "महिला विकास योजना किसके अंतर्गत आती है?",
+        options: ["भारत सरकार", "राज्य सरकार", "महिला एवं बाल विकास मंत्रालय", "सभी"],
+        answer: "महिला एवं बाल विकास मंत्रालय"
+    },
+    {
+        question: "भारत में महिला सशक्तिकरण की शुरुआत कब हुई?",
+        options: ["1947", "1972", "1986", "2000"],
+        answer: "1986"
+    },
+    {
+        question: "महिला को सामाजिक, आर्थिक, और राजनीतिक दृष्टि से सशक्त बनाने के लिए कौन सी योजना शुरू की गई थी?",
+        options: ["महिला सशक्तिकरण योजना", "बेटी बचाओ, बेटी पढ़ाओ", "मुद्रा योजना", "प्रधानमंत्री उज्जवला योजना"],
+        answer: "बेटी बचाओ, बेटी पढ़ाओ"
+    },
+    {
+        question: "भारत में आंगनवाड़ी कार्यकर्ता किस योजना का हिस्सा हैं?",
+        options: ["नारी सुरक्षा योजना", "स्वास्थ्य योजना", "इंदिरा गांधी मातृत्व योजना", "महिला एवं बाल विकास योजना"],
+        answer: "महिला एवं बाल विकास योजना"
+    },
+    {
+        question: "भारत में आंगनवाड़ी कार्यकर्ताओं को किस प्रकार का प्रशिक्षण दिया जाता है?",
+        options: ["स्वास्थ्य", "शिक्षा", "बाल देखभाल", "सभी"],
+        answer: "सभी"
+    },
+    {
+        question: "महिला एवं बाल विकास मंत्रालय का मुख्यालय कहाँ है?",
+        options: ["दिल्ली", "मुंबई", "भोपाल", "कोलकाता"],
+        answer: "दिल्ली"
+    },
+
+    {
+        question: "भारत में महिला शिक्षा के लिए कौन सी योजना शुरू की गई थी?",
+        options: ["सर्व शिक्षा अभियान", "मातृ शिक्षा योजना", "नारी सशक्तिकरण योजना", "प्रधानमंत्री महिला शक्ति योजना"],
+        answer: "सर्व शिक्षा अभियान"
+    },
+    {
+        question: "भारत में महिला सुरक्षा के लिए कौन सा कानून लागू किया गया?",
+        options: ["महिला अधिकार संरक्षण अधिनियम", "दहेज प्रतिषेध अधिनियम", "नीति आयोग महिला सुरक्षा योजना", "महिला अपराध अधिनियम"],
+        answer: "महिला अधिकार संरक्षण अधिनियम"
+    },
+    {
+        question: "भारत में किस संगठन ने महिला स्वास्थ्य के लिए अभियान शुरू किया?",
+        options: ["भारत सरकार", "विश्व स्वास्थ्य संगठन", "नेशनल हेल्थ मिशन", "बेटी बचाओ अभियान"],
+        answer: "नेशनल हेल्थ मिशन"
+    },
+    {
+        question: "भारत में महिला सशक्तिकरण के लिए किस मंत्री ने योजना बनाई?",
+        options: ["स्मृति ईरानी", "मेहुल चोकसी", "सोनिया गांधी", "राजनाथ सिंह"],
+        answer: "स्मृति ईरानी"
+    },
+    {
+        question: "किस वर्ष भारत में महिला एवं बाल विकास मंत्रालय की स्थापना हुई थी?",
+        options: ["1985", "1978", "1992", "2000"],
+        answer: "1985"
+    },
+    {
+        question: "भारत में महिला को शिक्षा देने के लिए किस योजना का शुभारंभ हुआ?",
+        options: ["बेटी पढ़ाओ बेटी बचाओ", "स्कूल शिक्षा मिशन", "महिला सशक्तिकरण योजना", "शिक्षा अधिकार योजना"],
+        answer: "बेटी पढ़ाओ बेटी बचाओ"
+    },
+    {
+        question: "भारत में महिला हिंसा की रोकथाम के लिए कौन सी योजना शुरू की गई?",
+        options: ["महिला सुरक्षा योजना", "बेटी बचाओ, बेटी पढ़ाओ", "महिला अधिकार सुरक्षा अधिनियम", "आधुनिक महिला योजना"],
+        answer: "महिला सुरक्षा योजना"
+    },
+    {
+        question: "भारत में महिला सशक्तिकरण को बढ़ावा देने के लिए किस योजना को लागू किया गया?",
+        options: ["राष्ट्रीय महिला आयोग", "महिला सशक्तिकरण योजना", "रक्षा सुरक्षा योजना", "राष्ट्रीय रोजगार योजना"],
+        answer: "राष्ट्रीय महिला आयोग"
+    },
+    {
+        question: "भारत में महिला पुलिस कर्मचारियों के लिए कौन सी योजना लागू की गई?",
+        options: ["महिला अपराध सुरक्षा योजना", "महिला अधिकारों के संरक्षण कानून", "महिला पुलिस प्रशिक्षण योजना", "महिला हेल्पलाइन योजना"],
+        answer: "महिला पुलिस प्रशिक्षण योजना"
+    },
+    {
+        question: "भारत में महिला संगठनों के द्वारा किस योजना को बढ़ावा दिया जा रहा है?",
+        options: ["महिला जन जागरूकता अभियान", "राष्ट्रीय महिला आयोग", "रानी लक्ष्मीबाई अभियान", "स्वयं सहायता समूह"],
+        answer: "स्वयं सहायता समूह"
+    },
+    {
+        question: "भारत में महिला सुरक्षा कानून किसे लागू किया गया है?",
+        options: ["दहेज प्रथा उन्मूलन अधिनियम", "महिला अधिकार कानून", "यौन उत्पीड़न अधिनियम", "समान अधिकार कानून"],
+        answer: "यौन उत्पीड़न अधिनियम"
+    },
+    {
+        question: "भारत में महिला सशक्तिकरण के लिए 'समर्थन' योजना किसने शुरू की?",
+        options: ["केंद्र सरकार", "राज्य सरकार", "महिला आयोग", "राष्ट्रीय महिला आयोग"],
+        answer: "केंद्र सरकार"
+    },
+    {
+        question: "भारत में महिला स्वास्थ्य के क्षेत्र में कौन सा अभियान चलाया गया?",
+        options: ["स्वास्थ्य मंत्रालय अभियान", "महिला स्वास्थ्य सेवा अभियान", "स्वास्थ्य शिक्षा अभियान", "महिला स्वास्थ्य सुरक्षा अभियान"],
+        answer: "महिला स्वास्थ्य सेवा अभियान"
+    },
+    {
+        question: "भारत में महिलाओं की स्थिति में सुधार के लिए किस आयोग का गठन किया गया?",
+        options: ["महिला आयोग", "कृषि आयोग", "संसदीय आयोग", "रोजगार आयोग"],
+        answer: "महिला आयोग"
+    },
+    {
+        question: "भारत में महिला सुरक्षा के लिए 'स्मार्ट पुलिस' योजना किसके द्वारा शुरू की गई?",
+        options: ["केंद्र सरकार", "राज्य सरकार", "दिल्ली पुलिस", "महिला आयोग"],
+        answer: "दिल्ली पुलिस"
+    },
+    {
+        question: "भारत में महिला सशक्तिकरण के लिए किस कानून को लागू किया गया?",
+        options: ["महिला अधिकार संरक्षण कानून", "महिला सुरक्षा एक्ट", "महिला उत्पीड़न नियम", "महिला सशक्तिकरण अधिनियम"],
+        answer: "महिला सशक्तिकरण अधिनियम"
+    },
+    {
+        question: "भारत में महिलाओं के लिए क्या योजना शुरू की गई थी जिससे वे अपनी आवाज़ उठा सकें?",
+        options: ["महिला हेल्पलाइन योजना", "बेटी बचाओ बेटी पढ़ाओ", "महिला स्वावलंबन योजना", "महिला सुरक्षा योजना"],
+        answer: "महिला हेल्पलाइन योजना"
+    },
+    {
+        question: "भारत में महिलाओं के लिए किस योजना के तहत रोजगार के अवसर सृजित किए गए?",
+        options: ["महिला सशक्तिकरण योजना", "महिला सृजन योजना", "राष्ट्रीय ग्रामीण रोजगार योजना", "सशक्त महिला योजना"],
+        answer: "राष्ट्रीय ग्रामीण रोजगार योजना"
+    },
+    {
+        question: "भारत में महिला स्वास्थ्य हेतु स्वास्थ्य मंत्रालय ने कौन सी योजना शुरू की?",
+        options: ["प्रधानमंत्री स्वास्थ्य योजना", "महिला स्वास्थ्य सुरक्षा योजना", "महिला स्वास्थ्य विकास योजना", "महिला और बाल सुरक्षा योजना"],
+        answer: "महिला स्वास्थ्य सुरक्षा योजना"
+    },
+    {
+        question: "भारत में महिलाओं के लिए पहली बार क्या योजना बनाई गई थी?",
+        options: ["महिला सम्मान योजना", "स्वास्थ्य विकास योजना", "महिला बाल कल्याण योजना", "स्वच्छता अभियान"],
+        answer: "महिला बाल कल्याण योजना"
+    },
+    {
+        question: "भारत में महिलाओं के लिए किस योजना के तहत शिक्षा को बढ़ावा दिया गया?",
+        options: ["सर्व शिक्षा अभियान", "प्रधानमंत्री योजना", "सशक्त महिला शिक्षा योजना", "बेटी पढ़ाओ बेटी बचाओ"],
+        answer: "सर्व शिक्षा अभियान"
+    },
+    {
+        question: "भारत में महिला कल्याण की दिशा में कौन सा संगठन कार्यरत है?",
+        options: ["महिला आयोग", "राष्ट्रीय महिला संगठन", "रानी लक्ष्मीबाई संस्थान", "राष्ट्रीय महिला विकास संगठन"],
+        answer: "राष्ट्रीय महिला विकास संगठन"
+    },
+    {
+        question: "भारत में महिलाएं सुरक्षा के लिए किस योजना के तहत जागरूक हो रही हैं?",
+        options: ["महिला सुरक्षा जागरूकता अभियान", "महिला सशक्तिकरण योजना", "महिला हेल्पलाइन योजना", "बेटी बचाओ बेटी पढ़ाओ"],
+        answer: "महिला सुरक्षा जागरूकता अभियान"
+    },
+    {
+        question: "भारत में महिला अधिकारों के लिए किस योजना के तहत काम किया जा रहा है?",
+        options: ["महिला अधिकार क़ानून", "महिला सशक्तिकरण कानून", "महिला अधिकार संरक्षण योजना", "महिला सुरक्षा अभियान"],
+        answer: "महिला अधिकार संरक्षण योजना"
+    },
+    {
+        question: "भारत में महिला सशक्तिकरण के लिए कौन सी योजना शुरू की गई है?",
+        options: ["महिला सशक्तिकरण योजना", "राष्ट्रीय महिला विकास योजना", "महिला स्वावलंबन योजना", "आधिकारिक महिला योजना"],
+        answer: "महिला सशक्तिकरण योजना"
+    },
+    {
+        question: "भारत में महिला सशक्तिकरण के लिए किस मंत्रालय ने योजना बनाई?",
+        options: ["महिला एवं बाल विकास मंत्रालय", "स्वास्थ्य मंत्रालय", "शिक्षा मंत्रालय", "कृषि मंत्रालय"],
+        answer: "महिला एवं बाल विकास मंत्रालय"
+    },
+            // Add remaining 90 questions similarly...
+        ];
+
+        let currentQuestion = 0;
+        let userAnswers = [];
+
+        function loadQuestion() {
+            const question = questions[currentQuestion];
+            document.getElementById("questionText").textContent = `${currentQuestion + 1}. ${question.question}`;
+
+            let optionsHtml = "";
+            question.options.forEach(function(option, index) {
+                optionsHtml += `
+                    <input type="radio" name="answer" value="${option}" id="option${index}">
+                    <label for="option${index}">${option}</label><br>
+                `;
+            });
+
+            document.getElementById("options").innerHTML = optionsHtml;
+
+            document.getElementById("previousBtn").style.display = currentQuestion === 0 ? "none" : "inline-block";
+            document.getElementById("nextBtn").style.display = currentQuestion === questions.length - 1 ? "none" : "inline-block";
+        }
+
+        function nextQuestion() {
+            saveAnswer();
+            currentQuestion++;
+            loadQuestion();
+        }
+
+        function previousQuestion() {
+            saveAnswer();
+            currentQuestion--;
+            loadQuestion();
+        }
+
+        function saveAnswer() {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            if (selectedOption) {
+                userAnswers[currentQuestion] = selectedOption.value;
+            } else {
+                userAnswers[currentQuestion] = null;
+            }
+        }
+
+        function submitExam() {
+            saveAnswer();
+            let attemptedQuestions = userAnswers.filter(function(answer) { return answer !== null }).length;
+            let correctAnswers = 0;
+            let wrongAnswers = 0;
+
+            userAnswers.forEach(function(answer, index) {
+                if (answer === questions[index].answer) {
+                    correctAnswers++;
+                } else if (answer !== null) {
+                    wrongAnswers++;
+                }
+            });
+
+            document.getElementById("totalQuestions").textContent = questions.length;
+            document.getElementById("attemptedQuestions").textContent = attemptedQuestions;
+            document.getElementById("correctAnswers").textContent = correctAnswers;
+            document.getElementById("wrongAnswers").textContent = wrongAnswers;
+
+            document.getElementById("examContainer").style.display = "none";
+            document.getElementById("summaryContainer").style.display = "block";
+        }
+
+        function showAnswers() {
+            const answerList = document.getElementById("answerList");
+            answerList.innerHTML = "";
+
+            questions.forEach((question, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === question.answer;
+                const resultText = isCorrect ? "Correct" : "Wrong";
+
+                const answerHTML = `
+                    <div>
+                        <h3>Question ${index + 1}: ${question.question}</h3>
+                        <p>Your Answer: ${userAnswer || "No Answer"}<br>Correct Answer: ${question.answer}</p>
+                        <p>Result: ${resultText}</p>
+                    </div>
+                `;
+                answerList.innerHTML += answerHTML;
+            });
+
+            document.getElementById("summaryContainer").style.display = "none";
+            document.getElementById("answerContainer").style.display = "block";
+        }
+
+        function restartExam() {
+            currentQuestion = 0;
+            userAnswers = [];
+            document.getElementById("answerContainer").style.display = "none";
+            document.getElementById("examContainer").style.display = "block";
+            loadQuestion();
+        }
+
+        // Start the exam
+        loadQuestion();
+    </script>
+
+</body>
+</html>
+
